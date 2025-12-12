@@ -53,6 +53,28 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger to automatically update updated_at
+-- Drop if exists to avoid errors on re-run
+DROP TRIGGER IF EXISTS update_reviews_updated_at ON reviews;
 CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Row Level Security (RLS) Policies
+-- For single-user mode, we'll allow all operations
+-- In production with multi-user, you'd restrict by user_id
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow all operations on albums" ON albums;
+DROP POLICY IF EXISTS "Allow all operations on reviews" ON reviews;
+
+-- Enable RLS on tables (if not already enabled)
+ALTER TABLE albums ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+-- Allow all operations for now (single-user mode)
+-- TODO: When adding authentication, update these policies to filter by user_id
+CREATE POLICY "Allow all operations on albums" ON albums
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all operations on reviews" ON reviews
+  FOR ALL USING (true) WITH CHECK (true);
 

@@ -2,32 +2,60 @@ import { supabase, type Album, type Review } from './supabase'
 
 // Get all reviews with album data
 export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'date') {
-  let query = supabase
+  // First, get reviews
+  let reviewsQuery = supabase
     .from('reviews')
-    .select(`
-      *,
-      albums (*)
-    `)
+    .select('*')
 
   if (userId) {
-    query = query.eq('user_id', userId)
+    reviewsQuery = reviewsQuery.eq('user_id', userId)
   }
 
   // Sort by rating (desc) or date (desc)
   if (sortBy === 'rating') {
-    query = query.order('rating', { ascending: false })
+    reviewsQuery = reviewsQuery.order('rating', { ascending: false })
   } else {
-    query = query.order('listened_at', { ascending: false })
+    reviewsQuery = reviewsQuery.order('listened_at', { ascending: false })
   }
 
-  const { data, error } = await query
+  const { data: reviews, error: reviewsError } = await reviewsQuery
 
-  if (error) {
-    console.error('Error fetching reviews:', error)
+  if (reviewsError) {
+    console.error('Error fetching reviews:', reviewsError)
+    console.error('Query details:', { userId, sortBy })
     return []
   }
 
-  return data as Review[]
+  if (!reviews || reviews.length === 0) {
+    console.log('No reviews found')
+    return []
+  }
+
+  // Get unique album IDs
+  const albumIds = [...new Set(reviews.map(r => r.album_id))]
+  
+  // Fetch albums separately
+  const { data: albums, error: albumsError } = await supabase
+    .from('albums')
+    .select('*')
+    .in('id', albumIds)
+
+  if (albumsError) {
+    console.error('Error fetching albums:', albumsError)
+    // Return reviews without album data rather than failing completely
+  }
+
+  // Create a map of albums by ID for quick lookup
+  const albumsMap = new Map((albums || []).map(album => [album.id, album]))
+
+  // Combine reviews with their albums
+  const reviewsWithAlbums = reviews.map(review => ({
+    ...review,
+    albums: albumsMap.get(review.album_id) || null
+  }))
+
+  console.log(`Fetched ${reviewsWithAlbums.length} reviews with ${albums?.length || 0} albums`)
+  return reviewsWithAlbums as Review[]
 }
 
 // Get a single review by ID

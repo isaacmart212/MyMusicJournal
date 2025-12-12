@@ -53,6 +53,7 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
       }
 
       setIsEditing(false)
+      setLoading(false)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

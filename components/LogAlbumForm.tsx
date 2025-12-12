@@ -42,6 +42,16 @@ export default function LogAlbumForm() {
       // Generate a unique ID for the album (simple timestamp-based for manual entries)
       const albumId = `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
+      console.log('Creating album with ID:', albumId)
+      console.log('Album data:', {
+        id: albumId,
+        title: formData.title,
+        artist: formData.artist,
+        release_year: formData.release_year || null,
+        image_url: formData.image_url || null,
+        spotify_id: null,
+      })
+
       // First, create/update the album
       const albumResponse = await fetch('/api/albums', {
         method: 'POST',
@@ -58,9 +68,19 @@ export default function LogAlbumForm() {
         }),
       })
 
+      const albumData = await albumResponse.json()
+      console.log('Album response status:', albumResponse.status)
+      console.log('Album response data:', albumData)
+
       if (!albumResponse.ok) {
-        throw new Error('Failed to save album')
+        const errorMsg = albumData?.error || albumData?.message || `HTTP ${albumResponse.status}: Failed to save album`
+        console.error('Album creation failed:', errorMsg, albumData)
+        setError(`Album Error: ${errorMsg}`)
+        setLoading(false)
+        return
       }
+
+      console.log('Album created successfully, now creating review...')
 
       // Then, create the review
       const reviewResponse = await fetch('/api/reviews', {
@@ -77,15 +97,26 @@ export default function LogAlbumForm() {
         }),
       })
 
+      const reviewData = await reviewResponse.json()
+      console.log('Review response status:', reviewResponse.status)
+      console.log('Review response data:', reviewData)
+
       if (!reviewResponse.ok) {
-        throw new Error('Failed to save review')
+        const errorMsg = reviewData?.error || reviewData?.message || `HTTP ${reviewResponse.status}: Failed to save review`
+        console.error('Review creation failed:', errorMsg, reviewData)
+        setError(`Review Error: ${errorMsg}`)
+        setLoading(false)
+        return
       }
+
+      console.log('Both album and review created successfully! Redirecting...')
 
       // Redirect to home page
       router.push('/')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Unexpected error:', err)
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
       setLoading(false)
     }
   }
