@@ -46,9 +46,9 @@ export default function StarRating({ rating, onRatingChange, readOnly = false }:
             onMouseLeave={handleMouseLeave}
             disabled={readOnly}
             className={`
-              text-3xl transition-colors
+              text-2xl transition-colors
               ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-110'}
-              ${filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}
+              ${filled ? 'text-[#1a1a1a]' : 'text-[#e5e5e5]'}
             `}
             aria-label={`Rate ${value} stars`}
           >
@@ -57,7 +57,7 @@ export default function StarRating({ rating, onRatingChange, readOnly = false }:
         )
       })}
       {!readOnly && (
-        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+        <span className="ml-3 text-xs text-[#737373]">
           {rating > 0 ? `${rating}/5` : 'Click to rate'}
         </span>
       )}

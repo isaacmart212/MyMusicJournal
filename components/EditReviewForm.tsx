@@ -88,46 +88,46 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
 
   if (!isEditing) {
     return (
-      <div className="space-y-6">
-        <div className="flex gap-4">
+      <div className="space-y-8">
+        <div className="flex gap-3">
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded hover:opacity-80"
+            className="px-4 py-2 text-sm font-medium text-[#1a1a1a] border border-[#1a1a1a] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-colors"
           >
-            Edit Review
+            Edit
           </button>
           <button
             onClick={handleDelete}
             disabled={loading}
-            className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50 dark:hover:bg-red-950 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-[#737373] border border-[#e5e5e5] rounded-sm hover:bg-[#f5f5f5] disabled:opacity-50 transition-colors"
           >
             Delete
           </button>
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-2">Your Rating</h2>
+          <p className="text-xs font-medium mb-3 text-[#737373] uppercase tracking-wide">Rating</p>
           <StarRating rating={review.rating} onRatingChange={() => {}} readOnly />
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-2">Date Listened</h2>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">Date Listened</p>
+          <p className="text-sm text-[#1a1a1a]">
             {format(new Date(review.listened_at), 'MMMM d, yyyy')}
           </p>
         </div>
 
         {review.favorite && (
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">❤️</span>
-            <span className="text-sm font-medium">Marked as favorite</span>
+          <div className="flex items-center gap-2 pt-2">
+            <span className="text-sm">❤️</span>
+            <span className="text-sm text-[#1a1a1a]">Favorite</span>
           </div>
         )}
 
         {review.review_text && (
           <div>
-            <h2 className="text-lg font-semibold mb-2">Review</h2>
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            <p className="text-xs font-medium mb-3 text-[#737373] uppercase tracking-wide">Review</p>
+            <p className="text-sm text-[#1a1a1a] whitespace-pre-wrap leading-relaxed">
               {review.review_text}
             </p>
           </div>
@@ -139,13 +139,13 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
           {error}
         </div>
       )}
 
       <div>
-        <label className="block text-sm font-medium mb-2">Rating *</label>
+        <label className="block text-xs font-medium mb-3 text-[#737373] uppercase tracking-wide">Rating *</label>
         <StarRating
           rating={formData.rating}
           onRatingChange={(rating) => setFormData({ ...formData, rating })}
@@ -153,7 +153,7 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
       </div>
 
       <div>
-        <label htmlFor="listened_at" className="block text-sm font-medium mb-2">
+        <label htmlFor="listened_at" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
           Date Listened *
         </label>
         <input
@@ -162,12 +162,12 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
           required
           value={formData.listened_at}
           onChange={(e) => setFormData({ ...formData, listened_at: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+          className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
         />
       </div>
 
       <div>
-        <label htmlFor="review_text" className="block text-sm font-medium mb-2">
+        <label htmlFor="review_text" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
           Review / Notes
         </label>
         <textarea
@@ -175,29 +175,29 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
           rows={6}
           value={formData.review_text}
           onChange={(e) => setFormData({ ...formData, review_text: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+          className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors resize-none"
           placeholder="Write your thoughts about this album..."
         />
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center pt-2">
         <input
           type="checkbox"
           id="favorite"
           checked={formData.favorite}
           onChange={(e) => setFormData({ ...formData, favorite: e.target.checked })}
-          className="w-4 h-4 mr-2"
+          className="w-4 h-4 mr-2 text-[#1a1a1a] border-[#e5e5e5] rounded-sm focus:ring-[#1a1a1a]"
         />
-        <label htmlFor="favorite" className="text-sm font-medium">
-          Mark as favorite ❤️
+        <label htmlFor="favorite" className="text-sm text-[#1a1a1a]">
+          Mark as favorite
         </label>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded hover:opacity-80 disabled:opacity-50"
+          className="px-6 py-2 text-sm font-medium text-[#1a1a1a] border border-[#1a1a1a] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
@@ -214,7 +214,7 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
             setError(null)
           }}
           disabled={loading}
-          className="px-6 py-2 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-900 disabled:opacity-50"
+          className="px-6 py-2 text-sm font-medium text-[#737373] border border-[#e5e5e5] rounded-sm hover:bg-[#f5f5f5] transition-colors disabled:opacity-50"
         >
           Cancel
         </button>

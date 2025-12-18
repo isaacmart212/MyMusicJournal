@@ -42,16 +42,6 @@ export default function LogAlbumForm() {
       // Generate a unique ID for the album (simple timestamp-based for manual entries)
       const albumId = `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-      console.log('Creating album with ID:', albumId)
-      console.log('Album data:', {
-        id: albumId,
-        title: formData.title,
-        artist: formData.artist,
-        release_year: formData.release_year || null,
-        image_url: formData.image_url || null,
-        spotify_id: null,
-      })
-
       // First, create/update the album
       const albumResponse = await fetch('/api/albums', {
         method: 'POST',
@@ -69,18 +59,14 @@ export default function LogAlbumForm() {
       })
 
       const albumData = await albumResponse.json()
-      console.log('Album response status:', albumResponse.status)
-      console.log('Album response data:', albumData)
 
       if (!albumResponse.ok) {
-        const errorMsg = albumData?.error || albumData?.message || `HTTP ${albumResponse.status}: Failed to save album`
+        const errorMsg = albumData?.error || albumData?.message || 'Failed to save album'
         console.error('Album creation failed:', errorMsg, albumData)
-        setError(`Album Error: ${errorMsg}`)
+        setError(errorMsg)
         setLoading(false)
         return
       }
-
-      console.log('Album created successfully, now creating review...')
 
       // Then, create the review
       const reviewResponse = await fetch('/api/reviews', {
@@ -98,44 +84,37 @@ export default function LogAlbumForm() {
       })
 
       const reviewData = await reviewResponse.json()
-      console.log('Review response status:', reviewResponse.status)
-      console.log('Review response data:', reviewData)
 
       if (!reviewResponse.ok) {
-        const errorMsg = reviewData?.error || reviewData?.message || `HTTP ${reviewResponse.status}: Failed to save review`
+        const errorMsg = reviewData?.error || reviewData?.message || 'Failed to save review'
         console.error('Review creation failed:', errorMsg, reviewData)
-        setError(`Review Error: ${errorMsg}`)
+        setError(errorMsg)
         setLoading(false)
         return
       }
 
-      console.log('Both album and review created successfully! Redirecting...')
-
-      // Redirect to home page
-      router.push('/')
+      // Redirect to home page with cache busting
+      router.push('/?t=' + Date.now())
       router.refresh()
     } catch (err) {
-      console.error('Unexpected error:', err)
       setError(err instanceof Error ? err.message : 'An unexpected error occurred')
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
-        <div className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Left Column - Album Info */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Album Information</h2>
-          
+        <div className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-2">
+            <label htmlFor="title" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Album Title *
             </label>
             <input
@@ -144,13 +123,13 @@ export default function LogAlbumForm() {
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
               placeholder="Enter album title"
             />
           </div>
 
           <div>
-            <label htmlFor="artist" className="block text-sm font-medium mb-2">
+            <label htmlFor="artist" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Artist *
             </label>
             <input
@@ -159,13 +138,13 @@ export default function LogAlbumForm() {
               required
               value={formData.artist}
               onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
               placeholder="Enter artist name"
             />
           </div>
 
           <div>
-            <label htmlFor="release_year" className="block text-sm font-medium mb-2">
+            <label htmlFor="release_year" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Release Year
             </label>
             <input
@@ -173,13 +152,13 @@ export default function LogAlbumForm() {
               id="release_year"
               value={formData.release_year}
               onChange={(e) => setFormData({ ...formData, release_year: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
               placeholder="e.g., 2023"
             />
           </div>
 
           <div>
-            <label htmlFor="image_url" className="block text-sm font-medium mb-2">
+            <label htmlFor="image_url" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Album Cover URL
             </label>
             <input
@@ -187,14 +166,14 @@ export default function LogAlbumForm() {
               id="image_url"
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
               placeholder="https://example.com/album-cover.jpg"
             />
             {formData.image_url && (
               <img
                 src={formData.image_url}
                 alt="Album preview"
-                className="mt-2 w-32 h-32 object-cover rounded"
+                className="mt-3 w-24 h-24 object-cover rounded-sm border border-[#e5e5e5]"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
                 }}
@@ -204,11 +183,9 @@ export default function LogAlbumForm() {
         </div>
 
         {/* Right Column - Review Info */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Your Review</h2>
-
+        <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-xs font-medium mb-3 text-[#737373] uppercase tracking-wide">
               Rating *
             </label>
             <StarRating
@@ -218,7 +195,7 @@ export default function LogAlbumForm() {
           </div>
 
           <div>
-            <label htmlFor="listened_at" className="block text-sm font-medium mb-2">
+            <label htmlFor="listened_at" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Date Listened *
             </label>
             <input
@@ -227,12 +204,12 @@ export default function LogAlbumForm() {
               required
               value={formData.listened_at}
               onChange={(e) => setFormData({ ...formData, listened_at: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="review_text" className="block text-sm font-medium mb-2">
+            <label htmlFor="review_text" className="block text-xs font-medium mb-2 text-[#737373] uppercase tracking-wide">
               Review / Notes
             </label>
             <textarea
@@ -240,38 +217,38 @@ export default function LogAlbumForm() {
               rows={6}
               value={formData.review_text}
               onChange={(e) => setFormData({ ...formData, review_text: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-black text-black dark:text-white"
+              className="w-full px-3 py-2 border border-[#e5e5e5] rounded-sm bg-white text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-colors resize-none"
               placeholder="Write your thoughts about this album..."
             />
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center pt-2">
             <input
               type="checkbox"
               id="favorite"
               checked={formData.favorite}
               onChange={(e) => setFormData({ ...formData, favorite: e.target.checked })}
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4 mr-2 text-[#1a1a1a] border-[#e5e5e5] rounded-sm focus:ring-[#1a1a1a]"
             />
-            <label htmlFor="favorite" className="text-sm font-medium">
-              Mark as favorite ❤️
+            <label htmlFor="favorite" className="text-sm text-[#1a1a1a]">
+              Mark as favorite
             </label>
           </div>
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4">
+      <div className="flex gap-3 pt-4 border-t border-[#e5e5e5]">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded hover:opacity-80 disabled:opacity-50"
+          className="px-6 py-2 text-sm font-medium text-[#1a1a1a] border border-[#1a1a1a] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : 'Save Review'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="px-6 py-2 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-900"
+          className="px-6 py-2 text-sm font-medium text-[#737373] border border-[#e5e5e5] rounded-sm hover:bg-[#f5f5f5] transition-colors"
         >
           Cancel
         </button>

@@ -16,24 +16,23 @@ export default function SortControls() {
   }
 
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Sort by:</span>
+    <div className="flex items-center gap-2">
       <button
         onClick={() => handleSortChange('date')}
-        className={`px-3 py-1 text-sm rounded transition-colors ${
+        className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           currentSort === 'date'
-            ? 'bg-black dark:bg-white text-white dark:text-black'
-            : 'border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900'
+            ? 'text-[#1a1a1a] border-b border-[#1a1a1a]'
+            : 'text-[#737373] hover:text-[#1a1a1a]'
         }`}
       >
         Date
       </button>
       <button
         onClick={() => handleSortChange('rating')}
-        className={`px-3 py-1 text-sm rounded transition-colors ${
+        className={`px-3 py-1.5 text-xs font-medium transition-colors ${
           currentSort === 'rating'
-            ? 'bg-black dark:bg-white text-white dark:text-black'
-            : 'border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900'
+            ? 'text-[#1a1a1a] border-b border-[#1a1a1a]'
+            : 'text-[#737373] hover:text-[#1a1a1a]'
         }`}
       >
         Rating

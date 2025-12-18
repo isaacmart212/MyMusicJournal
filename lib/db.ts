@@ -22,18 +22,23 @@ export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'd
 
   if (reviewsError) {
     console.error('Error fetching reviews:', reviewsError)
-    console.error('Query details:', { userId, sortBy })
     return []
   }
 
   if (!reviews || reviews.length === 0) {
-    console.log('No reviews found')
+    console.log('No reviews found in database')
     return []
   }
+
+  console.log(`Found ${reviews.length} reviews in database`)
 
   // Get unique album IDs
   const albumIds = [...new Set(reviews.map(r => r.album_id))]
   
+  if (albumIds.length === 0) {
+    return []
+  }
+
   // Fetch albums separately
   const { data: albums, error: albumsError } = await supabase
     .from('albums')
@@ -48,14 +53,20 @@ export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'd
   // Create a map of albums by ID for quick lookup
   const albumsMap = new Map((albums || []).map(album => [album.id, album]))
 
+  console.log(`Found ${albums?.length || 0} albums for ${reviews.length} reviews`)
+  console.log('Album IDs from reviews:', albumIds)
+  console.log('Album IDs found:', albums?.map(a => a.id) || [])
+
   // Combine reviews with their albums
   const reviewsWithAlbums = reviews.map(review => ({
     ...review,
     albums: albumsMap.get(review.album_id) || null
   }))
 
-  console.log(`Fetched ${reviewsWithAlbums.length} reviews with ${albums?.length || 0} albums`)
-  return reviewsWithAlbums as Review[]
+  const reviewsWithValidAlbums = reviewsWithAlbums.filter(r => r.albums !== null)
+  console.log(`Returning ${reviewsWithValidAlbums.length} reviews with valid albums`)
+
+  return reviewsWithValidAlbums as Review[]
 }
 
 // Get a single review by ID
