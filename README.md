@@ -1,122 +1,141 @@
 # VinylLog
 
-A personal web application to track, rate, and review music albums - inspired by Letterboxd.
+VinylLog is a personal web application for tracking, rating, and reviewing music albums. Inspired by **Letterboxd**, it emphasizes a clean visual grid, diary-style logging, and thoughtful reviews — but for music.
 
-## Getting Started
+The project currently focuses on **manual album logging** as a first-class experience, with future plans to integrate external music APIs.
 
-### Prerequisites
+---
 
-- Node.js 18+ installed
-- A Supabase account (free tier works)
+## Features (Current)
 
-### Local Development
+### Manual Album Logging
 
-1. **Install dependencies:**
-```bash
-npm install
-```
+* Add albums manually with:
 
-2. **Set up Supabase:**
-   - Go to [supabase.com](https://supabase.com) and create a free account
-   - Create a new project
-   - Go to Settings → API to get your project URL and anon key
+  * Album title
+  * Artist
+  * Release year
+  * Cover art URL
+* Log listens with:
 
-3. **Set up environment variables:**
-   Create a `.env.local` file in the root directory:
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+  * Rating (1–5 or 1–10 scale)
+  * Written review / notes
+  * Date listened
+  * Favorite (heart) toggle
 
-4. **Set up the database:**
-   - In Supabase, go to SQL Editor
-   - Copy and paste the contents of `supabase-schema.sql`
-   - Run the SQL to create the tables
+### Diary / Grid View
 
-5. **Run the development server:**
-```bash
-npm run dev
-```
+* View all logged albums in a visual grid
+* Sort by:
 
-6. **View the app:**
-   Open [http://localhost:3000](http://localhost:3000) in your browser
+  * Most recent listens
+  * Highest rated
+* Hover states display rating and favorite status (Letterboxd-style)
 
-## Deployment
+### Single-User Focus
 
-### Option 1: Vercel (Recommended - Free & Easy)
+* Designed for personal use
+* Simple data model without social features (for now)
 
-Vercel is the easiest way to deploy Next.js apps:
+---
 
-1. **Push your code to GitHub:**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin your-github-repo-url
-git push -u origin main
-```
+## Tech Stack
 
-2. **Deploy to Vercel:**
-   - Go to [vercel.com](https://vercel.com)
-   - Sign up/login with GitHub
-   - Click "New Project"
-   - Import your GitHub repository
-   - Add environment variables:
-     - `NEXT_PUBLIC_SUPABASE_URL`
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - Click "Deploy"
+* **Frontend / Backend**: Next.js
 
-3. **Your app will be live!** Vercel will give you a URL like `your-app.vercel.app`
+  * Unified frontend and API routes
+* **Database**: Supabase (PostgreSQL)
 
-### Option 2: Netlify
+  * Relational schema for albums and reviews
+* **Styling**: Tailwind CSS
 
-1. Push to GitHub (same as above)
-2. Go to [netlify.com](https://netlify.com)
-3. Sign up and click "New site from Git"
-4. Connect your repository
-5. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-6. Add environment variables in Site settings
-7. Deploy!
+  * Rapid iteration and clean grid-based layouts
 
-### Option 3: Self-hosted
+---
 
-1. **Build the app:**
-```bash
-npm run build
-```
+## Data Model
 
-2. **Start the production server:**
-```bash
-npm start
-```
+### `albums`
 
-The app will run on `http://localhost:3000`
+Stores album metadata so it can be reused across logs.
 
-## Environment Variables
+| Field        | Type | Description     |
+| ------------ | ---- | --------------- |
+| id           | UUID | Primary key     |
+| title        | Text | Album title     |
+| artist       | Text | Artist name     |
+| image_url    | Text | Album cover URL |
+| release_year | Text | Year released   |
 
-For deployment, make sure to set these environment variables in your hosting platform:
+### `reviews`
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon/public key
+Stores individual listening logs.
 
-## Database Setup
+| Field       | Type        | Description       |
+| ----------- | ----------- | ----------------- |
+| id          | UUID        | Primary key       |
+| album_id    | Foreign Key | References albums |
+| rating      | Integer     | Numeric rating    |
+| review_text | Text        | Written review    |
+| listened_at | Date        | Date listened     |
+| favorite    | Boolean     | Favorite / heart  |
 
-Run the SQL schema in your Supabase SQL editor (see `supabase-schema.sql`). This creates:
-- `users` table (for future multi-user support)
-- `albums` table (cached album metadata)
-- `reviews` table (your logged entries)
+---
 
-## Features
+## UI Overview
 
-- ✅ Manual album logging
-- ✅ Star ratings (1-5)
-- ✅ Text reviews
-- ✅ Date listened tracking
-- ✅ Grid view of logged albums
-- ✅ Sort by date or rating
-- ✅ Recent listens section
-- ✅ Edit and delete reviews
-- 🔜 Spotify integration (coming soon)
+### Home / Profile Page
 
+* “Recent Listens” section
+* Main album grid
+* Hover effects reveal ratings and favorites
+
+### Logging Modal
+
+* Large album art preview
+* Inputs for:
+
+  * Rating
+  * Date listened
+  * Review text
+* Save action persists data to the database
+
+---
+
+## Roadmap
+
+### Phase 1 — Manual Logging (Current)
+
+* Album CRUD
+* Review logging
+* Sorting and grid layout
+
+### Phase 2 — UX Polish
+
+* Improved hover states and transitions
+* Better mobile layout
+* Empty states and loading indicators
+
+### Phase 3 — Spotify Integration (Coming Soon)
+
+* Spotify authentication
+* Import saved albums
+* Search Spotify’s catalog for metadata
+* Optional syncing with listening history
+
+> Spotify integration is intentionally deferred to keep the core experience simple and stable first.
+
+---
+
+## Inspiration
+
+* Letterboxd (visual diary + rating system)
+* Personal music journaling
+* Album-first listening culture
+
+---
+
+## Status
+
+This project is under active development and currently intended for **personal use**.
+Architecture and design choices are made with future extensibility in mind.
