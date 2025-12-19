@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getReviews } from '@/lib/db'
+import { requireAuth } from '@/lib/auth-helpers'
 import AlbumGrid from '@/components/AlbumGrid'
 import Navigation from '@/components/Navigation'
 import SortControls from '@/components/SortControls'
@@ -11,13 +12,16 @@ export default async function Home({
 }: {
   searchParams: { sortBy?: 'rating' | 'date' }
 }) {
+  // Require authentication
+  await requireAuth()
+
   const sortBy = searchParams?.sortBy || 'date'
-  const reviews = await getReviews(undefined, sortBy)
+  const reviews = await getReviews(sortBy)
 
   return (
     <main className="min-h-screen p-8 max-w-6xl mx-auto">
       <header className="mb-12">
-        <h1 className="text-3xl font-light mb-2 text-[#1a1a1a]">MyMusicJournal</h1>
+        <h1 className="text-3xl font-light mb-2 text-[#1a1a1a]">VinylLog</h1>
         <p className="text-sm text-[#737373]">
           Track and review your music collection
         </p>

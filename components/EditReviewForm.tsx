@@ -49,6 +49,11 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          // Redirect to login if unauthorized
+          router.push('/login')
+          return
+        }
         throw new Error('Failed to update review')
       }
 
@@ -75,6 +80,11 @@ export default function EditReviewForm({ review }: EditReviewFormProps) {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          // Redirect to login if unauthorized
+          router.push('/login')
+          return
+        }
         throw new Error('Failed to delete review')
       }
 

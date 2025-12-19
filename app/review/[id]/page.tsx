@@ -1,11 +1,15 @@
 import { notFound } from 'next/navigation'
 import { getReviewById } from '@/lib/db'
+import { requireAuth } from '@/lib/auth-helpers'
 import Image from 'next/image'
 import Link from 'next/link'
 import EditReviewForm from '@/components/EditReviewForm'
 import Navigation from '@/components/Navigation'
 
 export default async function ReviewPage({ params }: { params: { id: string } }) {
+  // Require authentication
+  await requireAuth()
+
   const review = await getReviewById(params.id)
 
   if (!review || !review.albums) {

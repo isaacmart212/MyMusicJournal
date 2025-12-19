@@ -19,8 +19,8 @@
 Create a file named `.env.local` in the project root:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_SUPABASE_URL=https://pyklpyqekelupunmbysh.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_lVgp0389I1TFurJL-xsMDg_F4NjCOYv
 ```
 
 ### Step 4: Set Up Database

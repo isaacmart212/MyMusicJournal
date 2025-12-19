@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/lib/auth-context'
 
 export const metadata: Metadata = {
   title: 'VinylLog - Track Your Music',
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="antialiased bg-[#fafafa] text-[#1a1a1a]">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   )

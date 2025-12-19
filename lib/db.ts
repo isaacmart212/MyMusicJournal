@@ -1,15 +1,22 @@
-import { supabase, type Album, type Review } from './supabase'
+import { createServerSupabaseClient } from './supabase-server'
+import type { Album, Review } from './supabase'
 
-// Get all reviews with album data
-export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'date') {
-  // First, get reviews
+// Get all reviews with album data (filtered by authenticated user)
+export async function getReviews(sortBy: 'rating' | 'date' = 'date') {
+  const supabase = await createServerSupabaseClient()
+
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return []
+  }
+
+  // Query reviews - RLS will automatically filter by user_id
   let reviewsQuery = supabase
     .from('reviews')
     .select('*')
-
-  if (userId) {
-    reviewsQuery = reviewsQuery.eq('user_id', userId)
-  }
+    .eq('user_id', user.id)
 
   // Sort by rating (desc) or date (desc)
   if (sortBy === 'rating') {
@@ -26,15 +33,12 @@ export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'd
   }
 
   if (!reviews || reviews.length === 0) {
-    console.log('No reviews found in database')
     return []
   }
 
-  console.log(`Found ${reviews.length} reviews in database`)
-
   // Get unique album IDs
   const albumIds = [...new Set(reviews.map(r => r.album_id))]
-  
+
   if (albumIds.length === 0) {
     return []
   }
@@ -47,15 +51,10 @@ export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'd
 
   if (albumsError) {
     console.error('Error fetching albums:', albumsError)
-    // Return reviews without album data rather than failing completely
   }
 
   // Create a map of albums by ID for quick lookup
   const albumsMap = new Map((albums || []).map(album => [album.id, album]))
-
-  console.log(`Found ${albums?.length || 0} albums for ${reviews.length} reviews`)
-  console.log('Album IDs from reviews:', albumIds)
-  console.log('Album IDs found:', albums?.map(a => a.id) || [])
 
   // Combine reviews with their albums
   const reviewsWithAlbums = reviews.map(review => ({
@@ -64,13 +63,14 @@ export async function getReviews(userId?: string, sortBy: 'rating' | 'date' = 'd
   }))
 
   const reviewsWithValidAlbums = reviewsWithAlbums.filter(r => r.albums !== null)
-  console.log(`Returning ${reviewsWithValidAlbums.length} reviews with valid albums`)
 
   return reviewsWithValidAlbums as Review[]
 }
 
 // Get a single review by ID
 export async function getReviewById(id: string) {
+  const supabase = await createServerSupabaseClient()
+
   const { data, error } = await supabase
     .from('reviews')
     .select(`
@@ -97,6 +97,8 @@ export async function upsertAlbum(album: {
   release_year?: string | null
   spotify_id?: string | null
 }) {
+  const supabase = await createServerSupabaseClient()
+
   const { data, error } = await supabase
     .from('albums')
     .upsert(album, { onConflict: 'id' })
@@ -113,16 +115,27 @@ export async function upsertAlbum(album: {
 
 // Create a review
 export async function createReview(review: {
-  user_id?: string | null
   album_id: string
   rating: number
   review_text?: string | null
   listened_at: string
   favorite?: boolean
 }) {
+  const supabase = await createServerSupabaseClient()
+
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('User must be authenticated')
+  }
+
   const { data, error } = await supabase
     .from('reviews')
-    .insert(review)
+    .insert({
+      ...review,
+      user_id: user.id,
+    })
     .select(`
       *,
       albums (*)
@@ -147,6 +160,8 @@ export async function updateReview(
     favorite?: boolean
   }
 ) {
+  const supabase = await createServerSupabaseClient()
+
   const { data, error } = await supabase
     .from('reviews')
     .update(updates)
@@ -167,6 +182,8 @@ export async function updateReview(
 
 // Delete a review
 export async function deleteReview(id: string) {
+  const supabase = await createServerSupabaseClient()
+
   const { error } = await supabase
     .from('reviews')
     .delete()

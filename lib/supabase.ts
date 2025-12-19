@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createBrowserClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -7,7 +7,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Legacy client for backward compatibility
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
+
+// Re-export new client utilities
+export { createClient } from './supabase-client'
+export { createServerSupabaseClient } from './supabase-server'
 
 // Types for our database
 export type Album = {
@@ -31,5 +36,14 @@ export type Review = {
   created_at: string
   updated_at: string
   albums?: Album
+}
+
+export type User = {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  created_at: string
+  updated_at: string
 }
 

@@ -61,6 +61,11 @@ export default function LogAlbumForm() {
       const albumData = await albumResponse.json()
 
       if (!albumResponse.ok) {
+        if (albumResponse.status === 401) {
+          // Redirect to login if unauthorized
+          router.push('/login')
+          return
+        }
         const errorMsg = albumData?.error || albumData?.message || 'Failed to save album'
         console.error('Album creation failed:', errorMsg, albumData)
         setError(errorMsg)
@@ -86,6 +91,11 @@ export default function LogAlbumForm() {
       const reviewData = await reviewResponse.json()
 
       if (!reviewResponse.ok) {
+        if (reviewResponse.status === 401) {
+          // Redirect to login if unauthorized
+          router.push('/login')
+          return
+        }
         const errorMsg = reviewData?.error || reviewData?.message || 'Failed to save review'
         console.error('Review creation failed:', errorMsg, reviewData)
         setError(errorMsg)
